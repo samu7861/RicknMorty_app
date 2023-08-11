@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/character_provider.dart';
+import 'package:dots_indicator/dots_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
+
+final _pageController = PageController();
+double _currentIndex = 0;
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
