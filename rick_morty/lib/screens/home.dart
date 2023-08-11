@@ -40,32 +40,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showCharacterInfo(BuildContext context, Character character) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(character.name),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.network(character.image),
-            SizedBox(height: 16),
-            Text('Status: ${character.status}'),
-            Text('Species: ${character.species}'),
-            Text('Type: ${character.type}'),
-            Text('Gender: ${character.gender}'),
-            Text('Origin: ${character.origin.name}'),
-            Text('Location: ${character.location.name}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            child: Text('Close'),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-          ),
-        ],
-      ),
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => CharacterInfoBottomSheet(character: character),
     );
   }
 
@@ -102,9 +80,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.black,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Buscar personaje',
+                    hintText: 'Search for characters',
+                    hintStyle: TextStyle(color: Colors.grey),
                     border: InputBorder.none,
-                    suffixIcon: Icon(Icons.search, color: Colors.grey),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey),
                   ),
                 ),
               ),
@@ -128,24 +107,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           _showCharacterInfo(context, _filteredCharacters[i]);
                         },
-                        child: Container(
-                          margin: const EdgeInsets.all(16.0),
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                                offset: Offset(4, 4),
+                        child: Hero(
+                          tag: 'character-${_filteredCharacters[i].id}',
+                          child: Container(
+                            margin: const EdgeInsets.all(16.0),
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 8,
+                                  spreadRadius: 2,
+                                  offset: Offset(4, 4),
+                                ),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                _filteredCharacters[i].image,
+                                fit: BoxFit.cover,
                               ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              _filteredCharacters[i].image,
-                              fit: BoxFit.cover,
                             ),
                           ),
                         ),
@@ -160,11 +142,88 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Buscar'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
+    );
+  }
+}
+
+class CharacterInfoBottomSheet extends StatelessWidget {
+  final Character character;
+
+  const CharacterInfoBottomSheet({required this.character});
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.5,
+      maxChildSize: 0.95,
+      minChildSize: 0.2,
+      builder: (context, controller) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.deepPurple, // Cambiar el color de fondo
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: ListView(
+            controller: controller,
+            children: [
+              Center(
+                child: Hero(
+                  tag: 'character-${character.id}',
+                  child: Container(
+                    width: 150,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 4),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.network(
+                        character.image,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                character.name,
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              Text('Status: ${character.status}',
+                  style: TextStyle(color: Colors.white)),
+              Text('Species: ${character.species}',
+                  style: TextStyle(color: Colors.white)),
+              Text('Type: ${character.type}',
+                  style: TextStyle(color: Colors.white)),
+              Text('Gender: ${character.gender}',
+                  style: TextStyle(color: Colors.white)),
+              Text('Origin: ${character.origin.name}',
+                  style: TextStyle(color: Colors.white)),
+              Text('Location: ${character.location.name}',
+                  style: TextStyle(color: Colors.white)),
+            ],
+          ),
+        );
+      },
     );
   }
 }
