@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/character_provider.dart';
-import '../models/character.dart'; // Asegúrate de importar tu modelo Character aquí
+import '../models/character.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -9,7 +9,36 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Método para mostrar la información del personaje
+  String _searchText = '';
+  late List<Character> _filteredCharacters = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAndFilterCharacters();
+  }
+
+  Future<void> _fetchAndFilterCharacters() async {
+    await Provider.of<CharactersProvider>(context, listen: false)
+        .fetchCharacters();
+    _filterCharacters(_searchText);
+  }
+
+  void _searchCharacter(String searchText) {
+    setState(() {
+      _searchText = searchText.toLowerCase();
+      _filterCharacters(_searchText);
+    });
+  }
+
+  void _filterCharacters(String searchText) {
+    _filteredCharacters = Provider.of<CharactersProvider>(context,
+            listen: false)
+        .characters
+        .where((character) => character.name.toLowerCase().contains(searchText))
+        .toList();
+  }
+
   void _showCharacterInfo(BuildContext context, Character character) {
     showDialog(
       context: context,
@@ -51,20 +80,39 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Color(0xFF2F1B4E),
       body: Column(
         children: <Widget>[
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                labelText: 'Buscar personaje',
-                border: OutlineInputBorder(),
-                suffixIcon: Icon(Icons.search),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(2, 2),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: TextField(
+                  onChanged: _searchCharacter,
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'Buscar personaje',
+                    border: InputBorder.none,
+                    suffixIcon: Icon(Icons.search, color: Colors.grey),
+                  ),
+                ),
               ),
             ),
           ),
           Expanded(
             child: FutureBuilder(
-              future: Provider.of<CharactersProvider>(context, listen: false)
-                  .fetchCharacters(),
+              future: _fetchAndFilterCharacters(),
               builder: (ctx, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -72,29 +120,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Center(child: Text('An error occurred!'));
                 } else {
                   return Container(
-                    height: MediaQuery.of(context).size.height *
-                        0.35, // Ajusta a un 35% de la altura de la pantalla para tener espacio para la sombra.
+                    height: MediaQuery.of(context).size.height * 0.35,
                     child: PageView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: Provider.of<CharactersProvider>(context)
-                          .characters
-                          .length,
+                      itemCount: _filteredCharacters.length,
                       itemBuilder: (ctx, i) => GestureDetector(
                         onTap: () {
-                          _showCharacterInfo(
-                              context,
-                              Provider.of<CharactersProvider>(context,
-                                      listen: false)
-                                  .characters[i]);
+                          _showCharacterInfo(context, _filteredCharacters[i]);
                         },
                         child: Container(
-                          margin: const EdgeInsets.all(
-                              16.0), // Márgenes alrededor de la imagen.
-                          width: MediaQuery.of(context).size.width *
-                              0.5, // 50% del ancho de la pantalla
+                          margin: const EdgeInsets.all(16.0),
+                          width: MediaQuery.of(context).size.width * 0.5,
                           decoration: BoxDecoration(
                             boxShadow: [
-                              // Sombras alrededor del contenedor de la imagen
                               BoxShadow(
                                 color: Colors.black26,
                                 blurRadius: 8,
@@ -104,14 +142,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                           child: ClipRRect(
-                            // Para asegurarnos de que la sombra se aplique correctamente
-                            borderRadius: BorderRadius.circular(
-                                10), // Radio de borde ligeramente redondeado
+                            borderRadius: BorderRadius.circular(10),
                             child: Image.network(
-                              Provider.of<CharactersProvider>(context,
-                                      listen: false)
-                                  .characters[i]
-                                  .image,
+                              _filteredCharacters[i].image,
                               fit: BoxFit.cover,
                             ),
                           ),
