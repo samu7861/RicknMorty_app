@@ -16,15 +16,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: TextField(
               decoration: InputDecoration(
                 labelText: 'Buscar personaje',
                 border: OutlineInputBorder(),
                 suffixIcon: Icon(Icons.search),
               ),
-              // Aquí puedes implementar la lógica de búsqueda si la API lo permite.
             ),
           ),
           Expanded(
@@ -34,16 +33,21 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (ctx, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
+                } else if (snapshot.error != null) {
+                  return Center(child: Text('An error occurred!'));
                 } else {
-                  return ListView.builder(
+                  return PageView.builder(
+                    scrollDirection: Axis.horizontal,
                     itemCount: Provider.of<CharactersProvider>(context)
                         .characters
                         .length,
-                    itemBuilder: (ctx, i) => ListTile(
-                      title: Text(Provider.of<CharactersProvider>(context)
-                          .characters[i]
-                          .name),
-                      // Aquí puedes agregar más detalles como una imagen o descripción.
+                    itemBuilder: (ctx, i) => Container(
+                      width: MediaQuery.of(context).size.width,
+                      child: Image.network(
+                          Provider.of<CharactersProvider>(context)
+                              .characters[i]
+                              .image,
+                          fit: BoxFit.cover),
                     ),
                   );
                 }
@@ -53,12 +57,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Buscar'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
-        // Aquí puedes manejar la navegación entre las diferentes páginas.
       ),
     );
   }
