@@ -12,7 +12,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Rick and Morty Characters'),
+        backgroundColor: Colors.transparent,
+        elevation: 5.0,
+        centerTitle: true,
+        title: Text(
+          'Rick and Morty Characters',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20.0,
+          ),
+        ),
       ),
       body: Column(
         children: <Widget>[
@@ -34,7 +43,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.error != null) {
-                  return Center(child: Text('An error occurred!'));
+                  return Center(
+                    child: Text(
+                      '¡Ups! Ha ocurrido un error al cargar los personajes. Inténtalo de nuevo más tarde.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.redAccent),
+                    ),
+                  );
                 } else {
                   return PageView.builder(
                     scrollDirection: Axis.horizontal,
