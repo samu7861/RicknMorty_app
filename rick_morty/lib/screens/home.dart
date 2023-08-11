@@ -71,27 +71,50 @@ class _HomeScreenState extends State<HomeScreen> {
                 } else if (snapshot.error != null) {
                   return Center(child: Text('An error occurred!'));
                 } else {
-                  return PageView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: Provider.of<CharactersProvider>(context)
-                        .characters
-                        .length,
-                    itemBuilder: (ctx, i) => GestureDetector(
-                      onTap: () {
-                        _showCharacterInfo(
-                            context,
-                            Provider.of<CharactersProvider>(context,
-                                    listen: false)
-                                .characters[i]);
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        child: Image.network(
-                          Provider.of<CharactersProvider>(context,
-                                  listen: false)
-                              .characters[i]
-                              .image,
-                          fit: BoxFit.cover,
+                  return Container(
+                    height: MediaQuery.of(context).size.height *
+                        0.35, // Ajusta a un 35% de la altura de la pantalla para tener espacio para la sombra.
+                    child: PageView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: Provider.of<CharactersProvider>(context)
+                          .characters
+                          .length,
+                      itemBuilder: (ctx, i) => GestureDetector(
+                        onTap: () {
+                          _showCharacterInfo(
+                              context,
+                              Provider.of<CharactersProvider>(context,
+                                      listen: false)
+                                  .characters[i]);
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.all(
+                              16.0), // Márgenes alrededor de la imagen.
+                          width: MediaQuery.of(context).size.width *
+                              0.5, // 50% del ancho de la pantalla
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              // Sombras alrededor del contenedor de la imagen
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                                offset: Offset(4, 4),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            // Para asegurarnos de que la sombra se aplique correctamente
+                            borderRadius: BorderRadius.circular(
+                                10), // Radio de borde ligeramente redondeado
+                            child: Image.network(
+                              Provider.of<CharactersProvider>(context,
+                                      listen: false)
+                                  .characters[i]
+                                  .image,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                       ),
                     ),
