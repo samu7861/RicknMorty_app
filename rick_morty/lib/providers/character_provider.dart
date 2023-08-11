@@ -30,15 +30,11 @@ class CharactersProvider with ChangeNotifier {
       }
     } catch (error) {
       print(error);
-      // Aquí puedes manejar el error según tus necesidades.
-      // Por ejemplo, podrías lanzar el error para luego capturarlo
-      // en la interfaz de usuario y mostrar un mensaje apropiado.
       throw error;
     }
   }
 }
 
-// Esta clase es útil para manejar errores HTTP específicos.
 class HttpException implements Exception {
   final String message;
 

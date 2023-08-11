@@ -9,7 +9,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Aquí se definen las dos variables
   PageController _pageController = PageController();
   double _currentIndex = 0;
 
@@ -59,11 +58,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             .characters
                             .length,
                         itemBuilder: (ctx, i) {
-                          return Image.network(
-                              Provider.of<CharactersProvider>(context)
-                                  .characters[i]
-                                  .image,
-                              fit: BoxFit.cover);
+                          return Center(
+                            child: Container(
+                              height: MediaQuery.of(context).size.height * 0.30,
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: Image.network(
+                                  Provider.of<CharactersProvider>(context)
+                                      .characters[i]
+                                      .image,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          );
                         },
                       ),
                       Align(
@@ -75,9 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 .characters
                                 .length,
                             position: _currentIndex.round(),
-                            decorator: DotsDecorator(
-                                // Personaliza la apariencia aquí si lo deseas
-                                ),
+                            decorator: DotsDecorator(),
                           ),
                         ),
                       ),
