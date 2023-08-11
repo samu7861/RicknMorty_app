@@ -12,9 +12,7 @@ class MyApp extends StatelessWidget {
       create: (ctx) => CharactersProvider(),
       child: MaterialApp(
         title: 'Rick & Morty App',
-        theme: ThemeData(
-          primarySwatch: Colors.green,
-        ),
+        theme: ThemeData.dark(),
         home: HomeScreen(),
       ),
     );
