@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import "../providers/character_provider.dart";
-import 'package:dots_indicator/dots_indicator.dart';
+import '../providers/character_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -9,19 +8,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  PageController _pageController = PageController();
-  double _currentIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController.addListener(() {
-      setState(() {
-        _currentIndex = _pageController.page!;
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,8 +16,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: TextField(
               decoration: InputDecoration(
                 labelText: 'Buscar personaje',
@@ -50,44 +36,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 } else if (snapshot.error != null) {
                   return Center(child: Text('An error occurred!'));
                 } else {
-                  return Stack(
-                    children: [
-                      PageView.builder(
-                        controller: _pageController,
-                        itemCount: Provider.of<CharactersProvider>(context)
-                            .characters
-                            .length,
-                        itemBuilder: (ctx, i) {
-                          return Center(
-                            child: Container(
-                              height: MediaQuery.of(context).size.height * 0.30,
-                              child: Align(
-                                alignment: Alignment.topCenter,
-                                child: Image.network(
-                                  Provider.of<CharactersProvider>(context)
-                                      .characters[i]
-                                      .image,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: DotsIndicator(
-                            dotsCount: Provider.of<CharactersProvider>(context)
-                                .characters
-                                .length,
-                            position: _currentIndex.round(),
-                            decorator: DotsDecorator(),
-                          ),
-                        ),
-                      ),
-                    ],
+                  return PageView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: Provider.of<CharactersProvider>(context)
+                        .characters
+                        .length,
+                    itemBuilder: (ctx, i) => Container(
+                      width: MediaQuery.of(context).size.width,
+                      child: Image.network(
+                          Provider.of<CharactersProvider>(context)
+                              .characters[i]
+                              .image,
+                          fit: BoxFit.cover),
+                    ),
                   );
                 }
               },
@@ -96,18 +57,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Buscar'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
   }
 }
