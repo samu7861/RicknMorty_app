@@ -29,18 +29,18 @@ class Character {
 
   factory Character.fromJson(Map<String, dynamic> json) {
     return Character(
-      id: json['id'],
-      name: json['name'],
-      status: json['status'],
-      species: json['species'],
-      type: json['type'],
-      gender: json['gender'],
-      origin: Origin.fromJson(json['origin']),
-      location: Location.fromJson(json['location']),
-      image: json['image'],
-      episode: List<String>.from(json['episode']),
-      url: json['url'],
-      created: json['created'],
+      id: json['id'] ?? 0,
+      name: json['name'] ?? 'Unknown',
+      status: json['status'] ?? 'Unknown',
+      species: json['species'] ?? 'Unknown',
+      type: json['type'] ?? 'Unknown',
+      gender: json['gender'] ?? 'Unknown',
+      origin: Origin.fromJson(json['origin'] ?? {}),
+      location: Location.fromJson(json['location'] ?? {}),
+      image: json['image'] ?? '',
+      episode: List<String>.from(json['episode'] ?? []),
+      url: json['url'] ?? '',
+      created: json['created'] ?? 'Unknown',
     );
   }
 }
@@ -53,8 +53,8 @@ class Origin {
 
   factory Origin.fromJson(Map<String, dynamic> json) {
     return Origin(
-      name: json['name'],
-      url: json['url'],
+      name: json['name'] ?? 'Unknown',
+      url: json['url'] ?? '',
     );
   }
 }
@@ -67,8 +67,8 @@ class Location {
 
   factory Location.fromJson(Map<String, dynamic> json) {
     return Location(
-      name: json['name'],
-      url: json['url'],
+      name: json['name'] ?? 'Unknown',
+      url: json['url'] ?? '',
     );
   }
 }
