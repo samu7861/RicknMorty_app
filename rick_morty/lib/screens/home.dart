@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/character_provider.dart';
+import "../providers/character_provider.dart";
 import 'package:dots_indicator/dots_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -8,10 +8,21 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-final _pageController = PageController();
-double _currentIndex = 0;
-
 class _HomeScreenState extends State<HomeScreen> {
+  // Aquí se definen las dos variables
+  PageController _pageController = PageController();
+  double _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController.addListener(() {
+      setState(() {
+        _currentIndex = _pageController.page!;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,8 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: <Widget>[
-          const Padding(
-            padding: EdgeInsets.all(8.0),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: TextField(
               decoration: InputDecoration(
                 labelText: 'Buscar personaje',
@@ -40,19 +51,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 } else if (snapshot.error != null) {
                   return Center(child: Text('An error occurred!'));
                 } else {
-                  return PageView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: Provider.of<CharactersProvider>(context)
-                        .characters
-                        .length,
-                    itemBuilder: (ctx, i) => Container(
-                      width: MediaQuery.of(context).size.width,
-                      child: Image.network(
-                          Provider.of<CharactersProvider>(context)
-                              .characters[i]
-                              .image,
-                          fit: BoxFit.cover),
-                    ),
+                  return Stack(
+                    children: [
+                      PageView.builder(
+                        controller: _pageController,
+                        itemCount: Provider.of<CharactersProvider>(context)
+                            .characters
+                            .length,
+                        itemBuilder: (ctx, i) {
+                          return Image.network(
+                              Provider.of<CharactersProvider>(context)
+                                  .characters[i]
+                                  .image,
+                              fit: BoxFit.cover);
+                        },
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: DotsIndicator(
+                            dotsCount: Provider.of<CharactersProvider>(context)
+                                .characters
+                                .length,
+                            position: _currentIndex.round(),
+                            decorator: DotsDecorator(
+                                // Personaliza la apariencia aquí si lo deseas
+                                ),
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 }
               },
@@ -61,12 +90,18 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
+        items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Buscar'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 }
